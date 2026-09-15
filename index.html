@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CoinXP</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>CoinXP</h1>
+
+            <button id="addTransactionButton">
+                + Nova transação
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="intro">
+            <p>Visão geral</p>
+            <h2>Meu financeiro</h2>
+            <span>Controle suas receitas e despesas.</span>
+        </section>
+
+        <section class="cards">
+
+            <div class="card">
+                <span>Saldo</span>
+                <h3 id="balance">R$ 0,00</h3>
+            </div>
+
+            <div class="card">
+                <span>Receitas</span>
+                <h3 id="income">R$ 0,00</h3>
+            </div>
+
+            <div class="card">
+                <span>Despesas</span>
+                <h3 id="expenses">R$ 0,00</h3>
+            </div>
+
+        </section>
+
+        <section class="transactions">
+
+            <div class="transactions-header">
+                <div>
+                    <h2>Transações</h2>
+                    <p>Suas movimentações recentes</p>
+                </div>
+
+                <button id="viewAllButton">
+                    Ver todas
+                </button>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <h3>Nenhuma transação</h3>
+
+                <p>
+                    Você ainda não adicionou nenhuma movimentação.
+                </p>
+
+                <button id="emptyAddButton">
+                    + Adicionar transação
+                </button>
+            </div>
+
+            <div id="transactionList"></div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>CoinXP © 2026</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
+```
