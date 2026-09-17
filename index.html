@@ -29,6 +29,7 @@
             <span>Controle suas receitas e despesas.</span>
         </section>
 
+
         <section class="cards">
 
             <div class="card">
@@ -48,20 +49,40 @@
 
         </section>
 
+
         <section class="transactions">
 
             <div class="transactions-header">
+
                 <div>
                     <h2>Transações</h2>
                     <p>Suas movimentações recentes</p>
                 </div>
 
-                <button id="viewAllButton">
-                    Ver todas
-                </button>
             </div>
 
+
+            <div class="transaction-filters">
+
+                <span>Filtrar:</span>
+
+                <button id="allButton">
+                    Todas
+                </button>
+
+                <button id="incomeButton">
+                    Receitas
+                </button>
+
+                <button id="expenseButton">
+                    Despesas
+                </button>
+
+            </div>
+
+
             <div class="empty-state" id="emptyState">
+
                 <h3>Nenhuma transação</h3>
 
                 <p>
@@ -71,13 +92,16 @@
                 <button id="emptyAddButton">
                     + Adicionar transação
                 </button>
+
             </div>
+
 
             <div id="transactionList"></div>
 
         </section>
 
     </main>
+
 
     <div class="modal" id="transactionModal">
 
@@ -90,6 +114,7 @@
                     ×
                 </button>
             </div>
+
 
             <form id="transactionForm">
 
@@ -104,6 +129,7 @@
                     required
                 >
 
+
                 <label for="amount">
                     Valor
                 </label>
@@ -117,6 +143,7 @@
                     required
                 >
 
+
                 <label for="type">
                     Tipo
                 </label>
@@ -126,7 +153,27 @@
                     <option value="expense">Despesa</option>
                 </select>
 
+
+                <label for="category">
+                    Categoria
+                </label>
+
+                <select id="category" required>
+
+                    <option value="food">Alimentação</option>
+                    <option value="transport">Transporte</option>
+                    <option value="shopping">Compras</option>
+                    <option value="leisure">Lazer</option>
+                    <option value="home">Casa</option>
+                    <option value="work">Trabalho</option>
+                    <option value="study">Estudos</option>
+                    <option value="other">Outros</option>
+
+                </select>
+
+
                 <div class="form-buttons">
+
                     <button type="button" id="cancelButton">
                         Cancelar
                     </button>
@@ -134,6 +181,7 @@
                     <button type="submit">
                         Adicionar
                     </button>
+
                 </div>
 
             </form>
@@ -142,11 +190,14 @@
 
     </div>
 
+
     <footer>
         <p>CoinXP © 2026</p>
     </footer>
+
 
     <script src="js/script.js"></script>
 
 </body>
 </html>
+```
