@@ -6,6 +6,9 @@ const cancelButton = document.getElementById("cancelButton");
 const modal = document.getElementById("transactionModal");
 const form = document.getElementById("transactionForm");
 
+const modalTitle = document.getElementById("modalTitle");
+const submitButton = document.getElementById("submitButton");
+
 const descriptionInput = document.getElementById("description");
 const amountInput = document.getElementById("amount");
 const typeInput = document.getElementById("type");
@@ -23,225 +26,651 @@ const incomeButton = document.getElementById("incomeButton");
 const expenseButton = document.getElementById("expenseButton");
 
 let currentFilter = "all";
-
+let editingTransactionId = null;
 let transactions = [];
 
 
-function openModal() {
-    modal.style.display = "flex";
-    descriptionInput.focus();
-}
+/* =========================
+   CARREGAR TRANSAÇÕES
+========================= */
 
+function loadTransactions() {
 
-function closeTransactionModal() {
-    modal.style.display = "none";
-    form.reset();
-}
+    const savedTransactions =
+        localStorage.getItem("coinxpTransactions");
 
-
-addTransactionButton.addEventListener("click", openModal);
-
-emptyAddButton.addEventListener("click", openModal);
-
-closeModal.addEventListener("click", closeTransactionModal);
-
-cancelButton.addEventListener("click", closeTransactionModal);
-
-
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    const description = descriptionInput.value.trim();
-    const amount = Number(amountInput.value);
-    const type = typeInput.value;
-    const category = categoryInput.value;
-
-    if (!description || !amount || amount <= 0) {
+    if (!savedTransactions) {
+        transactions = [];
         return;
     }
 
-    const transaction = {
-        id: Date.now(),
-        description: description,
-        amount: amount,
-        type: type,
-        category: category
-    };
+    try {
 
-    transactions.push(transaction);
+        transactions = JSON.parse(savedTransactions);
 
-    renderTransactions();
-    updateValues();
+        if (!Array.isArray(transactions)) {
+            transactions = [];
+        }
 
-    closeTransactionModal();
-});
+    } catch (error) {
 
+        console.log("Erro ao carregar transações:", error);
+
+        transactions = [];
+
+    }
+}
+
+
+/* =========================
+   SALVAR TRANSAÇÕES
+========================= */
+
+function saveTransactions() {
+
+    localStorage.setItem(
+        "coinxpTransactions",
+        JSON.stringify(transactions)
+    );
+
+}
+
+
+/* =========================
+   ABRIR MODAL
+========================= */
+
+function openModal() {
+
+    modal.style.display = "flex";
+
+    modalTitle.textContent = "Nova transação";
+
+    submitButton.textContent = "Adicionar";
+
+    form.reset();
+
+    editingTransactionId = null;
+
+    descriptionInput.focus();
+
+}
+
+
+/* =========================
+   FECHAR MODAL
+========================= */
+
+function closeTransactionModal() {
+
+    modal.style.display = "none";
+
+    form.reset();
+
+    editingTransactionId = null;
+
+    modalTitle.textContent = "Nova transação";
+
+    submitButton.textContent = "Adicionar";
+
+}
+
+
+/* =========================
+   EVENTOS DO MODAL
+========================= */
+
+addTransactionButton.addEventListener(
+    "click",
+    openModal
+);
+
+emptyAddButton.addEventListener(
+    "click",
+    openModal
+);
+
+closeModal.addEventListener(
+    "click",
+    closeTransactionModal
+);
+
+cancelButton.addEventListener(
+    "click",
+    closeTransactionModal
+);
+
+
+/* =========================
+   ADICIONAR / EDITAR
+========================= */
+
+form.addEventListener(
+    "submit",
+    function (event) {
+
+        event.preventDefault();
+
+        const description =
+            descriptionInput.value.trim();
+
+        const amount =
+            Number(amountInput.value);
+
+        const type =
+            typeInput.value;
+
+        const category =
+            categoryInput.value;
+
+
+        if (
+            description === "" ||
+            isNaN(amount) ||
+            amount <= 0
+        ) {
+            return;
+        }
+
+
+        /* EDITAR */
+
+        if (editingTransactionId !== null) {
+
+            transactions =
+                transactions.map(
+                    function (transaction) {
+
+                        if (
+                            transaction.id ===
+                            editingTransactionId
+                        ) {
+
+                            return {
+                                ...transaction,
+                                description: description,
+                                amount: amount,
+                                type: type,
+                                category: category
+                            };
+
+                        }
+
+                        return transaction;
+
+                    }
+                );
+
+        }
+
+
+        /* ADICIONAR */
+
+        else {
+
+            const newTransaction = {
+
+                id: Date.now(),
+
+                description: description,
+
+                amount: amount,
+
+                type: type,
+
+                category: category
+
+            };
+
+            transactions.push(newTransaction);
+
+        }
+
+
+        saveTransactions();
+
+        renderTransactions();
+
+        updateValues();
+
+        closeTransactionModal();
+
+    }
+);
+
+
+/* =========================
+   MOSTRAR TRANSAÇÕES
+========================= */
 
 function renderTransactions() {
 
     transactionList.innerHTML = "";
 
+
     let filteredTransactions = transactions;
 
+
     if (currentFilter === "income") {
-        filteredTransactions = transactions.filter(function (transaction) {
-            return transaction.type === "income";
-        });
+
+        filteredTransactions =
+            transactions.filter(
+                function (transaction) {
+
+                    return transaction.type === "income";
+
+                }
+            );
+
     }
+
 
     if (currentFilter === "expense") {
-        filteredTransactions = transactions.filter(function (transaction) {
-            return transaction.type === "expense";
-        });
+
+        filteredTransactions =
+            transactions.filter(
+                function (transaction) {
+
+                    return transaction.type === "expense";
+
+                }
+            );
+
     }
 
+
     if (filteredTransactions.length === 0) {
+
         emptyState.style.display = "block";
+
         return;
+
     }
+
 
     emptyState.style.display = "none";
 
-    filteredTransactions.forEach(function (transaction) {
 
-        const item = document.createElement("div");
+    filteredTransactions.forEach(
+        function (transaction) {
 
-        item.classList.add("transaction-item");
+            const item =
+                document.createElement("div");
 
-        const signal = transaction.type === "income" ? "+" : "-";
+            item.classList.add(
+                "transaction-item"
+            );
 
-        const categoryName = getCategoryName(transaction.category);
 
-        item.innerHTML = `
-            <div>
-                <strong>${transaction.description}</strong>
-                <span>${categoryName}</span>
-            </div>
+            const information =
+                document.createElement("div");
 
-            <div class="transaction-actions">
 
-                <strong>
-                    ${signal} ${formatMoney(transaction.amount)}
-                </strong>
+            const description =
+                document.createElement("strong");
 
-                <button class="delete-button" title="Excluir transação">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18"></path>
-                        <path d="M8 6V4h8v2"></path>
-                        <path d="M19 6l-1 15H6L5 6"></path>
-                        <path d="M10 11v6"></path>
-                        <path d="M14 11v6"></path>
-                    </svg>
-                </button>
+            description.textContent =
+                transaction.description;
 
-            </div>
-        `;
 
-        const deleteButton = item.querySelector(".delete-button");
+            const category =
+                document.createElement("span");
 
-        deleteButton.addEventListener("click", function () {
+            category.textContent =
+                getCategoryName(
+                    transaction.category
+                );
 
-            transactions = transactions.filter(function (item) {
-                return item.id !== transaction.id;
-            });
 
-            renderTransactions();
-            updateValues();
+            information.appendChild(description);
 
-        });
+            information.appendChild(category);
 
-        transactionList.appendChild(item);
-    });
+
+            const actions =
+                document.createElement("div");
+
+            actions.classList.add(
+                "transaction-actions"
+            );
+
+
+            const value =
+                document.createElement("strong");
+
+            const signal =
+                transaction.type === "income"
+                    ? "+"
+                    : "-";
+
+
+            value.textContent =
+                `${signal} ${formatMoney(transaction.amount)}`;
+
+
+            /* BOTÃO EDITAR */
+
+            const editButton =
+                document.createElement("button");
+
+            editButton.classList.add(
+                "edit-button"
+            );
+
+            editButton.title =
+                "Editar transação";
+
+            editButton.innerHTML = `
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                </svg>
+            `;
+
+
+            editButton.addEventListener(
+                "click",
+                function () {
+
+                    editTransaction(transaction);
+
+                }
+            );
+
+
+            /* BOTÃO EXCLUIR */
+
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.classList.add(
+                "delete-button"
+            );
+
+            deleteButton.title =
+                "Excluir transação";
+
+            deleteButton.innerHTML = `
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M19 6l-1 15H6L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                </svg>
+            `;
+
+
+            deleteButton.addEventListener(
+                "click",
+                function () {
+
+                    transactions =
+                        transactions.filter(
+                            function (item) {
+
+                                return item.id !== transaction.id;
+
+                            }
+                        );
+
+
+                    saveTransactions();
+
+                    renderTransactions();
+
+                    updateValues();
+
+                }
+            );
+
+
+            actions.appendChild(value);
+
+            actions.appendChild(editButton);
+
+            actions.appendChild(deleteButton);
+
+
+            item.appendChild(information);
+
+            item.appendChild(actions);
+
+
+            transactionList.appendChild(item);
+
+        }
+    );
+
 }
 
+
+/* =========================
+   EDITAR TRANSAÇÃO
+========================= */
+
+function editTransaction(transaction) {
+
+    editingTransactionId =
+        transaction.id;
+
+
+    descriptionInput.value =
+        transaction.description;
+
+    amountInput.value =
+        transaction.amount;
+
+    typeInput.value =
+        transaction.type;
+
+    categoryInput.value =
+        transaction.category;
+
+
+    modalTitle.textContent =
+        "Editar transação";
+
+    submitButton.textContent =
+        "Salvar alterações";
+
+
+    modal.style.display = "flex";
+
+    descriptionInput.focus();
+
+}
+
+
+/* =========================
+   CATEGORIAS
+========================= */
 
 function getCategoryName(category) {
 
     const categories = {
+
         food: "Alimentação",
+
         transport: "Transporte",
+
         shopping: "Compras",
+
         leisure: "Lazer",
+
         home: "Casa",
+
         work: "Trabalho",
+
         study: "Estudos",
+
         other: "Outros"
+
     };
 
+
     return categories[category] || "Outros";
+
 }
 
+
+/* =========================
+   ATUALIZAR VALORES
+========================= */
 
 function updateValues() {
 
     let totalIncome = 0;
+
     let totalExpenses = 0;
 
-    transactions.forEach(function (transaction) {
 
-        if (transaction.type === "income") {
-            totalIncome += transaction.amount;
-        } else {
-            totalExpenses += transaction.amount;
+    transactions.forEach(
+        function (transaction) {
+
+            const amount =
+                Number(transaction.amount) || 0;
+
+
+            if (transaction.type === "income") {
+
+                totalIncome += amount;
+
+            } else {
+
+                totalExpenses += amount;
+
+            }
+
         }
+    );
 
-    });
 
-    const totalBalance = totalIncome - totalExpenses;
+    const totalBalance =
+        totalIncome - totalExpenses;
 
-    income.textContent = formatMoney(totalIncome);
-    expenses.textContent = formatMoney(totalExpenses);
-    balance.textContent = formatMoney(totalBalance);
+
+    income.textContent =
+        formatMoney(totalIncome);
+
+    expenses.textContent =
+        formatMoney(totalExpenses);
+
+    balance.textContent =
+        formatMoney(totalBalance);
+
 }
 
+
+/* =========================
+   FORMATAR DINHEIRO
+========================= */
 
 function formatMoney(value) {
 
-    return value.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
+    return Number(value).toLocaleString(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
 
 }
 
 
-// FILTRO: TODAS
-allButton.addEventListener("click", function () {
+/* =========================
+   FILTRO TODAS
+========================= */
 
-    currentFilter = "all";
+allButton.addEventListener(
+    "click",
+    function () {
 
-    allButton.classList.add("active");
-    incomeButton.classList.remove("active");
-    expenseButton.classList.remove("active");
+        currentFilter = "all";
 
-    renderTransactions();
-});
+        allButton.classList.add("active");
 
+        incomeButton.classList.remove("active");
 
-// FILTRO: RECEITAS
-incomeButton.addEventListener("click", function () {
+        expenseButton.classList.remove("active");
 
-    currentFilter = "income";
+        renderTransactions();
 
-    incomeButton.classList.add("active");
-    allButton.classList.remove("active");
-    expenseButton.classList.remove("active");
-
-    renderTransactions();
-});
+    }
+);
 
 
-// FILTRO: DESPESAS
-expenseButton.addEventListener("click", function () {
+/* =========================
+   FILTRO RECEITAS
+========================= */
 
-    currentFilter = "expense";
+incomeButton.addEventListener(
+    "click",
+    function () {
 
-    expenseButton.classList.add("active");
-    allButton.classList.remove("active");
-    incomeButton.classList.remove("active");
+        currentFilter = "income";
 
-    renderTransactions();
-});
+        incomeButton.classList.add("active");
 
+        allButton.classList.remove("active");
+
+        expenseButton.classList.remove("active");
+
+        renderTransactions();
+
+    }
+);
+
+
+/* =========================
+   FILTRO DESPESAS
+========================= */
+
+expenseButton.addEventListener(
+    "click",
+    function () {
+
+        currentFilter = "expense";
+
+        expenseButton.classList.add("active");
+
+        allButton.classList.remove("active");
+
+        incomeButton.classList.remove("active");
+
+        renderTransactions();
+
+    }
+);
+
+
+/* =========================
+   INICIAR
+========================= */
+
+loadTransactions();
 
 allButton.classList.add("active");
+
+renderTransactions();
+
+updateValues();

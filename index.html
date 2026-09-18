@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,20 +14,27 @@
 
     <header>
         <div class="header-container">
+
             <h1>CoinXP</h1>
 
             <button id="addTransactionButton">
                 + Nova transação
             </button>
+
         </div>
     </header>
+
 
     <main class="container">
 
         <section class="intro">
+
             <p>Visão geral</p>
+
             <h2>Meu financeiro</h2>
+
             <span>Controle suas receitas e despesas.</span>
+
         </section>
 
 
@@ -55,8 +63,11 @@
             <div class="transactions-header">
 
                 <div>
+
                     <h2>Transações</h2>
+
                     <p>Suas movimentações recentes</p>
+
                 </div>
 
             </div>
@@ -108,11 +119,15 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h2>Nova transação</h2>
+
+                <h2 id="modalTitle">
+                    Nova transação
+                </h2>
 
                 <button id="closeModal">
                     ×
                 </button>
+
             </div>
 
 
@@ -149,8 +164,15 @@
                 </label>
 
                 <select id="type" required>
-                    <option value="income">Receita</option>
-                    <option value="expense">Despesa</option>
+
+                    <option value="income">
+                        Receita
+                    </option>
+
+                    <option value="expense">
+                        Despesa
+                    </option>
+
                 </select>
 
 
@@ -160,14 +182,37 @@
 
                 <select id="category" required>
 
-                    <option value="food">Alimentação</option>
-                    <option value="transport">Transporte</option>
-                    <option value="shopping">Compras</option>
-                    <option value="leisure">Lazer</option>
-                    <option value="home">Casa</option>
-                    <option value="work">Trabalho</option>
-                    <option value="study">Estudos</option>
-                    <option value="other">Outros</option>
+                    <option value="food">
+                        Alimentação
+                    </option>
+
+                    <option value="transport">
+                        Transporte
+                    </option>
+
+                    <option value="shopping">
+                        Compras
+                    </option>
+
+                    <option value="leisure">
+                        Lazer
+                    </option>
+
+                    <option value="home">
+                        Casa
+                    </option>
+
+                    <option value="work">
+                        Trabalho
+                    </option>
+
+                    <option value="study">
+                        Estudos
+                    </option>
+
+                    <option value="other">
+                        Outros
+                    </option>
 
                 </select>
 
@@ -178,7 +223,7 @@
                         Cancelar
                     </button>
 
-                    <button type="submit">
+                    <button type="submit" id="submitButton">
                         Adicionar
                     </button>
 
@@ -192,12 +237,17 @@
 
 
     <footer>
-        <p>CoinXP © 2026</p>
+
+        <p>
+            CoinXP © 2026
+        </p>
+
     </footer>
 
 
     <script src="js/script.js"></script>
 
 </body>
+
 </html>
 ```
